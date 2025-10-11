@@ -1,0 +1,127 @@
+enum ProductType {
+  DIGITAL
+  PHYSICAL
+}
+
+model Product {
+  id                     String                 @id @default(uuid())
+  name                   String
+  priceInCents           Int
+  description            String
+  isAvailableForPurchase Boolean                @default(true)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  // New field to specify product type
+  type                   ProductType            @default(DIGITAL)
+
+  // Fields for Digital Products (nullable for physical products)
+  filePath               String?
+  imagePath              String? // Still useful for physical products, but not strictly for "download"
+  downloadVerifications  DownloadVerification[]
+
+  // Fields for Physical Products (nullable for digital products)
+  weightInGrams          Int? // e.g., for shipping calculations
+  dimensions             String? // e.g., "10cm x 5cm x 2cm"
+  sku                    String?                @unique // Stock Keeping Unit
+  stockQuantity          Int?                   @default(0) // Inventory count
+
+  // Relationships
+  orders                 Order[]
+  productVariants        ProductVariant[] // For variations like size, color
+  shippingDetails        ShippingDetail[] // Linking to specific shipping configurations
+}
+
+model ProductVariant {
+  id           String   @id @default(uuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name         String // e.g., "Size", "Color"
+  value        String // e.g., "Large", "Blue"
+  priceInCents Int      @default(0) // Optional: price adjustment for the variant
+  stock        Int      @default(0) // Inventory for this specific variant
+  sku          String?  @unique // Optional: SKU for the variant
+
+  // Could add imagePath specific to variant if needed
+}
+
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+  addresses Address[] // New: For shipping addresses
+}
+
+model Order {
+  id               String           @id @default(uuid())
+  pricePaidInCents Int
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  userId           String
+  productId        String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product          Product          @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // New: For physical product orders, a shipping address is crucial
+  shippingAddressId String?
+  shippingAddress   Address?         @relation(fields: [shippingAddressId], references: [id], onDelete: SetNull)
+
+  // New: Status of the order (e.g., Pending, Shipped, Delivered)
+  status           OrderStatus      @default(PENDING)
+  trackingNumber   String? // For physical products
+
+  // If you want to track which specific variant was ordered
+  productVariantId String?
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model DownloadVerification {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// New: For user shipping addresses
+model Address {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String
+  street       String
+  city         String
+  state        String?
+  postalCode   String
+  country      String
+  phoneNumber  String?
+  isDefault    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  orders       Order[]
+}
+
+// New: To handle different shipping methods/costs per product
+model ShippingDetail {
+  id             String      @id @default(uuid())
+  productId      String
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  methodName     String      // e.g., "Standard Shipping", "Express Shipping"
+  costInCents    Int         @default(0)
+  estimatedDays  Int?        // e.g., 3-5 business days
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
