@@ -23,14 +23,14 @@ export const orderStatuses = [
   "REFUNDED",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
-const OrderStatusEnum = pgEnum("order-statuses", orderStatuses);
+export const OrderStatusEnum = pgEnum("order-statuses", orderStatuses);
 
 export const roles = ["USER", "ADMIN"] as const;
 export type Role = (typeof roles)[number];
-const RolesEnum = pgEnum("roles", roles);
+export const RolesEnum = pgEnum("roles", roles);
 
 export const UserTable = pgTable("users", {
-  id,
+  id: text().notNull().primaryKey(),
   name: varchar({ length: 50 }).notNull(),
   email: text().notNull().unique(),
   imageUrl: text(),
@@ -47,7 +47,7 @@ export const UserRelations = relations(UserTable, ({ many }) => ({
 
 export const ProductTable = pgTable("products", {
   id,
-  userId: uuid()
+  userId: text()
     .notNull()
     .references(() => UserTable.id, { onDelete: "cascade" }),
   name: varchar({ length: 100 }).notNull(),
@@ -76,7 +76,7 @@ export const OrderTable = pgTable("orders", {
   pricePaidInCents: integer().notNull(),
   createdAt,
   updatedAt,
-  userId: uuid()
+  userId: text()
     .notNull()
     .references(() => UserTable.id, { onDelete: "cascade" }),
   productId: uuid()
@@ -105,7 +105,7 @@ export const OrderRelations = relations(OrderTable, ({ one }) => ({
 
 export const AddressTable = pgTable("addresses", {
   id,
-  userId: uuid()
+  userId: text()
     .notNull()
     .references(() => UserTable.id, { onDelete: "cascade" }),
   fullName: text().notNull(),
