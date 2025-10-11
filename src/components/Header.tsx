@@ -1,8 +1,9 @@
 "use client";
 
+import { UserButton } from "@clerk/nextjs";
 import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
+import Link from "next/link";
 import { Button } from "./ui/button";
-import { UserButton, UserProfile } from "@clerk/nextjs";
 
 export function Header() {
   return (
@@ -19,30 +20,30 @@ export function Header() {
           </div>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <a
+            <Link
               href="#"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
               New Arrivals
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
               Products
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
               Sales
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
               Orders
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -64,7 +65,7 @@ export function Header() {
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="h-5 w-5" />
             </Button>
-            <UserButton/>
+            <UserButton />
           </div>
         </div>
       </div>
