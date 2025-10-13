@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { createProduct } from "@/features/products/actions/products";
@@ -255,17 +256,29 @@ export function ProductForm() {
           />
         </div>
         <div className="my-8">
-          <UploadDropzone
-            endpoint={"imageUploader"}
-            onClientUploadComplete={(res) => {
-              res.forEach(({ serverData }) => {
-                form.setValue("imageUrl", serverData.imageUrl);
-                toast.success(serverData.message);
-              });
-            }}
-            onUploadError={(error: UploadThingError<Json>) => {
-              toast.error(error.message);
-            }}
+          <FormField
+            name="imageUrl"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product Image</FormLabel>
+                <FormControl>
+                  <UploadDropzone
+                    {...field}
+                    endpoint={"imageUploader"}
+                    onClientUploadComplete={(res) => {
+                      res.forEach(({ serverData }) => {
+                        form.setValue("imageUrl", serverData.imageUrl);
+                        toast.success(serverData.message);
+                      });
+                    }}
+                    onUploadError={(error: UploadThingError<Json>) => {
+                      toast.error(error.message);
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
           />
         </div>
         <FormField
@@ -286,7 +299,9 @@ export function ProductForm() {
         />
         <div className="flex justify-end">
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? <Loader2Icon /> : "Save"}
+            <LoadingSwap isLoading={form.formState.isSubmitting}>
+              Save
+            </LoadingSwap>
           </Button>
         </div>
       </form>

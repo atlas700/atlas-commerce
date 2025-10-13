@@ -10,8 +10,9 @@ import {
   Star,
   TrendingUp,
   Truck,
-  Zap
+  Zap,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -175,9 +176,11 @@ export default function HomePage() {
                   Trending Products
                 </h2>
               </div>
-              <Button variant="ghost" className="hidden sm:flex">
-                View All
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button variant="ghost" className="hidden sm:flex" asChild>
+                <Link href={"/products"}>
+                  View All
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
 
@@ -250,7 +253,7 @@ export default function HomePage() {
                         size="sm"
                         className="bg-neutral-900 dark:bg-neutral-100 hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-neutral-900"
                       >
-                        Add to Cart
+                        Buy Product
                       </Button>
                     </div>
                   </div>
