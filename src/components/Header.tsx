@@ -1,11 +1,12 @@
-"use client";
-
 import { UserButton } from "@clerk/nextjs";
 import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { getCurrentUser } from "@/services/clerk/lib/getSession";
 
-export function Header() {
+export async function Header() {
+  const { role } = await getCurrentUser(true);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -36,14 +37,16 @@ export function Header() {
               href="#"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
-              Sales
-            </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            >
               Orders
             </Link>
+            {role === "ADMIN" && (
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+              >
+                Dashboard
+              </Link>
+            )}
           </nav>
 
           <div className="flex items-center space-x-4">
