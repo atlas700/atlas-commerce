@@ -4,6 +4,7 @@ import { shadcn } from "@clerk/themes";
 import type { Metadata } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
+import { UploadthingSSR } from "@/services/uploadthing/UploadthingSSR";
 
 const soraSans = Sora({
   variable: "--font-sora-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
         >
           <main className="flex-1 px-4 md:px-8 w-full max-w-7xl mx-auto">
             {children}
+            <UploadthingSSR  />
             <Toaster position="top-right" closeButton richColors theme="dark" />
           </main>
         </body>

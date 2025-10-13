@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "../_components/PageHeader";
+import { Suspense } from "react";
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/drizzle";
 
 export default function AdminProductPage() {
   return (
@@ -13,7 +16,27 @@ export default function AdminProductPage() {
           </Link>
         </Button>
       </PageHeader>
-      {/* TODO: SHOW ALL PRODUCTS IN TABLE */}
+      <Suspense>
+        <SuspendedAdminProductPage />
+      </Suspense>
     </div>
   );
+}
+
+async function SuspendedAdminProductPage() {
+  const { userId, redirectToSignIn } = await auth();
+
+  if (userId == null) {
+    return redirectToSignIn();
+  }
+
+  const products = await getProducts();
+
+  return <div>
+    
+  </div>
+}
+
+async function getProducts() {
+  return await db.query.ProductTable.findMany();
 }
