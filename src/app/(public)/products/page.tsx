@@ -12,6 +12,7 @@ import { desc } from "drizzle-orm";
 import Image from "next/image";
 import { Suspense } from "react";
 
+
 export default function ProductsPage() {
   return (
     <div className="min-h-screen mt-28">
