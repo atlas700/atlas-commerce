@@ -66,7 +66,8 @@ export async function toggleProductAvailability(productId: string) {
 
   await db
     .update(ProductTable)
-    .set({ isAvailableForPurchase: !product.isAvailableForPurchase });
+    .set({ isAvailableForPurchase: !product.isAvailableForPurchase })
+    .where(eq(ProductTable.id, productId));
 
   return {
     error: false,

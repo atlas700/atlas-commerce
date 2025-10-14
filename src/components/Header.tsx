@@ -28,7 +28,7 @@ export async function Header() {
               New Arrivals
             </Link>
             <Link
-              href="#"
+              href="/products"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
               Products
