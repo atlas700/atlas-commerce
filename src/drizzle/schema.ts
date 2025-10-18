@@ -20,7 +20,6 @@ export const orderStatuses = [
   "SHIPPED",
   "DELIVERED",
   "CANCELLED",
-  "REFUNDED",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
 export const OrderStatusEnum = pgEnum("order-statuses", orderStatuses);

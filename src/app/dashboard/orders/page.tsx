@@ -1,5 +1,10 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ActionButton } from "@/components/ui/action-button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
     Table,
     TableBody,
@@ -9,39 +14,30 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { db } from "@/drizzle";
-import { OrderTable } from "@/drizzle/schema";
+import { orderStatuses } from "@/drizzle/schema";
+import { changeOrderStatus } from "@/features/orders/actions/orders";
 import { formatCurrency, formatDate } from "@/lib/formatters";
-import { getCurrentUser } from "@/services/clerk/lib/getSession";
-import { eq } from "drizzle-orm";
-import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
-export default async function UserOrdersPage() {
-  const { userId } = await getCurrentUser();
-  const userOrders = await getUserOrder(userId);
+export default async function AdminOrdersPage() {
+  const orders = await getOrders();
 
-  if (userOrders.length === 0) {
+  if (orders.length === 0) {
     return (
       <div className="min-h-screen mt-20">
-        <div className="flex justify-center items-center gap-6 flex-col h-full mt-32">
+        <div className="mt-32">
           <h1 className="font-semibold text-xl md:text-2xl tracking-tight">
-            You don't have orders yet, buy your first product
+            No Orders Yet.
           </h1>
-          <Button asChild>
-            <Link href={"/products"}>
-              Go To Products <ArrowRightIcon />
-            </Link>
-          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen mt-20">
-      <h1 className="font-bold text-2xl md:text-3xl tracking-tight">
-        Your Orders
+    <div className="min-h-screen">
+      <h1 className="font-bold text-2xl md:text-3xl tracking-tight mt-1">
+        All Orders
       </h1>
       <div className="mt-3">
         <Table>
@@ -53,10 +49,13 @@ export default async function UserOrdersPage() {
               <TableHead>Receiver Info</TableHead>
               <TableHead>Order Status</TableHead>
               <TableHead>Order Date</TableHead>
+              <TableHead>
+                <span className="sr-only">Actions</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {userOrders.map((order) => (
+            {orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="flex gap-2 items-center">
                   <div className="h-16 w-[40%] relative rounded-sm">
@@ -79,21 +78,27 @@ export default async function UserOrdersPage() {
                   {order.shippingAddress.phoneNumber}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={
-                      order.status === "CANCELLED"
-                        ? "destructive"
-                        : order.status === "DELIVERED"
-                        ? "default"
-                        : order.status === "PROCESSING"
-                        ? "outline"
-                        : order.status === "SHIPPED"
-                        ? "default"
-                        : "default"
-                    }
-                  >
-                    {order.status}
-                  </Badge>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>{order.status}</DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {orderStatuses.map((os) => (
+                        <DropdownMenuItem key={os}>
+                          <ActionButton
+                            action={changeOrderStatus.bind(null, {
+                              status: os,
+                              userId: order.user.id,
+                              orderId: order.id,
+                            })}
+                            size={"sm"}
+                            variant={"ghost"}
+                            className="w-full"
+                          >
+                            {os}
+                          </ActionButton>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
                 <TableCell>{formatDate(order.createdAt!)}</TableCell>
               </TableRow>
@@ -105,9 +110,8 @@ export default async function UserOrdersPage() {
   );
 }
 
-async function getUserOrder(userId: string) {
+async function getOrders() {
   return await db.query.OrderTable.findMany({
-    where: eq(OrderTable.userId, userId),
     columns: {
       id: true,
       pricePaidInCents: true,
@@ -128,6 +132,11 @@ async function getUserOrder(userId: string) {
           country: true,
           fullName: true,
           phoneNumber: true,
+        },
+      },
+      user: {
+        columns: {
+          id: true,
         },
       },
     },

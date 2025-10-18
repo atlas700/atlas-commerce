@@ -26,12 +26,6 @@ export function Header() {
               Products
             </Link>
             <Link
-              href="dashboard/sales"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            >
-              Sales
-            </Link>
-            <Link
               href="/dashboard/orders"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >

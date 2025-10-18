@@ -3,18 +3,15 @@
 import Stripe from "stripe";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "../clerk/lib/getSession";
+import { ProductTable } from "@/drizzle/schema";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-09-30.clover",
 });
 
-export async function createCheckoutSession(product: {
-  id: string;
-  name: string;
-  description?: string;
-  priceInCents: number;
-  currency?: string;
-}) {
+export async function createCheckoutSession(
+  product: typeof ProductTable.$inferSelect
+) {
   const { userId } = await getCurrentUser();
 
   const session = await stripe.checkout.sessions.create({
@@ -23,10 +20,11 @@ export async function createCheckoutSession(product: {
     line_items: [
       {
         price_data: {
-          currency: product.currency ?? "usd",
+          currency: "usd",
           product_data: {
             name: product.name,
             description: product.description ?? "",
+            images: [product.imageUrl!],
           },
           unit_amount: product.priceInCents,
         },

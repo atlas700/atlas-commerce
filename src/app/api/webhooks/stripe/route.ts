@@ -48,10 +48,10 @@ export async function POST(req: Request) {
 
         // Insert order record into your database
         await db.insert(OrderTable).values({
-          status: "PROCESSING",
-          paymentIntentId: session.payment_intent as string,
-          pricePaidInCents: session.amount_total ?? 0,
+          paymentIntentId: session.payment_intent,
           shippingAddressId: shippingDetails?.id,
+          pricePaidInCents: session.amount_total ?? 0,
+          status: "PROCESSING",
           productId,
           userId,
         });
