@@ -85,6 +85,7 @@ export const OrderTable = pgTable("orders", {
   shippingAddressId: uuid()
     .notNull()
     .references(() => AddressTable.id, { onDelete: "set null" }),
+    paymentIntentId: text().notNull(),
   status: OrderStatusEnum().default("PENDING"),
 });
 
@@ -115,8 +116,6 @@ export const AddressTable = pgTable("addresses", {
   phoneNumber: text(),
   createdAt,
   updatedAt,
-  // user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // orders       Order[]
 });
 
 export const AddressRelations = relations(AddressTable, ({ one, many }) => ({
